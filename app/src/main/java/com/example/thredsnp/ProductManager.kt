@@ -17,20 +17,21 @@ import java.io.FileOutputStream
 object ProductManager {
     private const val PREFS_NAME = "thredsnp_prefs"
     private const val KEY_PRODUCTS = "products_list"
+    private const val KEY_WISHLIST = "wishlist_list"
     private val database = FirebaseDatabase.getInstance().reference
 
     val products = mutableStateListOf<ProductItem>()
+    val wishlist = mutableStateListOf<ProductItem>()
     val orders = mutableStateListOf<Order>()
 
     fun init(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        
         if (products.isEmpty()) {
-            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val productsJson = prefs.getString(KEY_PRODUCTS, null)
-            
             if (productsJson != null) {
                 try {
                     val decoded = Json.decodeFromString<List<ProductItem>>(productsJson)
-                    products.clear()
                     products.addAll(decoded)
                 } catch (e: Exception) {
                     loadDefaults()
@@ -39,8 +40,17 @@ object ProductManager {
                 loadDefaults()
             }
         }
+
+        if (wishlist.isEmpty()) {
+            val wishlistJson = prefs.getString(KEY_WISHLIST, null)
+            if (wishlistJson != null) {
+                try {
+                    val decoded = Json.decodeFromString<List<ProductItem>>(wishlistJson)
+                    wishlist.addAll(decoded)
+                } catch (e: Exception) { }
+            }
+        }
         
-        // Setup real-time listener for orders from Firebase
         listenForOrders()
     }
 
@@ -75,16 +85,24 @@ object ProductManager {
                 if (file.exists()) {
                     file.delete()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            } catch (e: Exception) { }
         }
         products.remove(product)
+        wishlist.remove(product)
         saveProducts(context)
+        saveWishlist(context)
+    }
+
+    fun toggleWishlist(context: Context, product: ProductItem) {
+        if (wishlist.contains(product)) {
+            wishlist.remove(product)
+        } else {
+            wishlist.add(product)
+        }
+        saveWishlist(context)
     }
 
     fun placeOrder(context: Context, order: Order) {
-        // 1. Push to Firebase Realtime Database
         val orderId = order.id.replace("#", "")
         database.child("orders").child(orderId).setValue(order)
     }
@@ -102,10 +120,7 @@ object ProductManager {
                 orders.clear()
                 orders.addAll(newOrders)
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle database error
-            }
+            override fun onCancelled(error: DatabaseError) { }
         })
     }
 
@@ -131,5 +146,11 @@ object ProductManager {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val jsonString = Json.encodeToString(products.toList())
         prefs.edit().putString(KEY_PRODUCTS, jsonString).apply()
+    }
+
+    private fun saveWishlist(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val jsonString = Json.encodeToString(wishlist.toList())
+        prefs.edit().putString(KEY_WISHLIST, jsonString).apply()
     }
 }
