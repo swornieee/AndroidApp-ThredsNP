@@ -85,7 +85,7 @@ fun DashboardScreen() {
                     Text(
                         text = "THREDS NP", 
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFFFFD700), // Yellow color
+                        color = Color(0xFF800000), // Maroon Red
                         fontFamily = FontFamily.Serif,
                         fontStyle = FontStyle.Italic
                     ) 
