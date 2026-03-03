@@ -54,7 +54,7 @@ fun SplashContent(onTimeout: () -> Unit) {
                 imageVector = Icons.Default.ShoppingBag,
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
-                tint = Color.White
+                tint = Color.Blue
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
