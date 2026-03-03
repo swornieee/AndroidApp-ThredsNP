@@ -62,7 +62,7 @@ class Dashboardthreds : ComponentActivity() {
 fun DashboardScreen() {
     val cartItems = remember { mutableStateListOf<ProductItem>() }
     val userOrders = remember { mutableStateListOf<UserOrder>() }
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -236,7 +236,8 @@ fun WishlistScreen(wishlist: List<ProductItem>, onAddToCart: (ProductItem) -> Un
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize()
             ) {
                 items(wishlist) { product ->
                     ProductCard(product, isWishlisted = true, onAddToCart = { onAddToCart(product) }, onToggleWishlist = { onRemove(product) })
