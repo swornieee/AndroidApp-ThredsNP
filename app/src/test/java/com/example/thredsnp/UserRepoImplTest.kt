@@ -53,6 +53,15 @@ class UserRepoImplTest {
     }
 
     @Test
+    fun updateProfile_failsForInvalidId() {
+        val updates = mapOf("fullName" to "New Name")
+        userRepo.updateProfile("999", updates) { success, message ->
+            assertFalse(success)
+            assertEquals("User not found", message)
+        }
+    }
+
+    @Test
     fun deleteUser_removesUserFromList() {
         val user = UserModel(userId = "delete_me")
         userRepo.addUser(user) { _, _ -> }
@@ -62,6 +71,14 @@ class UserRepoImplTest {
             userRepo.getUserById("delete_me") { retrievedUser ->
                 assertNull(retrievedUser)
             }
+        }
+    }
+
+    @Test
+    fun deleteUser_failsForInvalidId() {
+        userRepo.deleteUser("non_existent") { success, message ->
+            assertFalse(success)
+            assertEquals("User not found", message)
         }
     }
 
