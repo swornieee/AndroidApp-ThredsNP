@@ -218,6 +218,7 @@ fun HomeScreen(products: List<ProductItem>, categories: List<Category>, onAddToC
             text = "Categories",
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF800000), // Maroon Red
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
         LazyRow(
