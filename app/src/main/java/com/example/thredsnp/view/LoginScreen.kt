@@ -92,7 +92,9 @@ fun LoginContent(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-            TextButton(onClick = { /* Handle forgot password */ }) {
+            TextButton(onClick = { 
+                context.startActivity(Intent(context, ForgotPasswordScreen::class.java))
+            }) {
                 Text("Forgot Password?")
             }
         }
@@ -115,7 +117,6 @@ fun LoginContent(modifier: Modifier = Modifier) {
 
         OutlinedButton(
             onClick = { 
-                // Navigate directly to Supplier Dashboard
                 context.startActivity(Intent(context, SupplierDashboard::class.java))
             },
             modifier = Modifier
