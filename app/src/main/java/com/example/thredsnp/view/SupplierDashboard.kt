@@ -148,7 +148,7 @@ fun SupplierDashboardScreen() {
         when (selectedTab) {
             0 -> InventoryScreen(innerPadding, products)
             1 -> OrdersScreen(innerPadding, orders)
-            2 -> AnalyticsScreen(innerPadding)
+            2 -> AnalyticsScreen(innerPadding, products, orders)
         }
     }
 }
@@ -294,13 +294,68 @@ fun OrdersScreen(paddingValues: PaddingValues, orders: List<Order>) {
 }
 
 @Composable
-fun AnalyticsScreen(paddingValues: PaddingValues) {
-    Box(
+fun AnalyticsScreen(paddingValues: PaddingValues, products: List<ProductItem>, orders: List<Order>) {
+    val totalRevenue = orders.sumOf { it.amount.replace("NRP ", "").replace(",", "").toIntOrNull() ?: 0 }
+    val totalOrders = orders.size
+    val totalProducts = products.size
+    val avgOrderValue = if (totalOrders > 0) totalRevenue / totalOrders else 0
+
+    Column(
         modifier = Modifier
             .padding(paddingValues)
-            .fillMaxSize(), contentAlignment = Alignment.Center
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Analytics Coming Soon!", fontSize = 20.sp)
+        Text("Store Analytics", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text("Overall Performance", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    AnalyticsStat("Revenue", "NRP $totalRevenue")
+                    AnalyticsStat("Orders", "$totalOrders")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    AnalyticsStat("Inventory", "$totalProducts Items")
+                    AnalyticsStat("Avg. Value", "NRP $avgOrderValue")
+                }
+            }
+        }
+
+        Text("Key Metrics", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+        
+        MetricRow("Total Products in Store", totalProducts.toFloat() / 50f, totalProducts.toString())
+        MetricRow("Monthly Order Goal", totalOrders.toFloat() / 100f, totalOrders.toString())
+        MetricRow("Customer Satisfaction", 0.92f, "92%")
+    }
+}
+
+@Composable
+fun AnalyticsStat(label: String, value: String) {
+    Column {
+        Text(label, fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f))
+        Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+    }
+}
+
+@Composable
+fun MetricRow(label: String, progress: Float, value: String) {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(label, fontSize = 14.sp)
+            Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        }
+        LinearProgressIndicator(
+            progress = { progress.coerceIn(0f, 1f) },
+            modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
+        )
     }
 }
 
