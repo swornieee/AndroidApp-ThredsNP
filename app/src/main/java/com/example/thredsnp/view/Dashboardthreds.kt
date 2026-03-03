@@ -115,12 +115,12 @@ fun DashboardScreen() {
                                 Toast.makeText(context, "Cart is empty", Toast.LENGTH_SHORT).show()
                             }
                         }) {
-                            Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+                            Icon(Icons.Default.ShoppingCart, contentDescription = "Cart", tint = Color.Black)
                         }
                     }
                     Box {
                         IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.Person, contentDescription = "Profile")
+                            Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.Black)
                         }
                         DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                             DropdownMenuItem(
