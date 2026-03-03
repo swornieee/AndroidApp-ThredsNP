@@ -70,7 +70,7 @@ fun DashboardScreen() {
     val categories = listOf(
         Category("Fashion", Icons.Default.Face),
         Category("Sports", Icons.Default.Star),
-        Category("Shoes", Icons.Default.ShoppingCart)
+        Category("Shoes", Icons.Default.IceSkating)
     )
 
     // Using the shared ProductManager
