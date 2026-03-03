@@ -90,7 +90,13 @@ fun SupplierDashboardScreen() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Supplier Portal", fontWeight = FontWeight.Bold) },
+                title = { 
+                    Text(
+                        text = "Supplier Portal", 
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF800000) // Maroon Red
+                    ) 
+                },
                 actions = {
                     IconButton(onClick = { /* Open Notifications */ }) {
                         Icon(Icons.Default.Notifications, contentDescription = "Notifications")
