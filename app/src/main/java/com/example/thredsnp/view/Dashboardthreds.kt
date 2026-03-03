@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,13 +27,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.thredsnp.ProductManager
+import com.example.thredsnp.model.ProductItem
 import com.example.thredsnp.view.ui.theme.THREDSNPTheme
 
 data class Category(val name: String, val icon: ImageVector)
@@ -53,7 +57,6 @@ class Dashboardthreds : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen() {
-    var searchQuery by remember { mutableStateOf("") }
     val cartItems = remember { mutableStateListOf<ProductItem>() }
     val userOrders = remember { mutableStateListOf<UserOrder>() }
     var selectedTab by remember { mutableStateOf(0) }
@@ -144,7 +147,7 @@ fun DashboardScreen() {
                     onClick = { selectedTab = 2 }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.List, contentDescription = null) },
+                    icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) },
                     label = { Text("Orders") },
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 }
@@ -157,15 +160,13 @@ fun DashboardScreen() {
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            if (selectedTab == 0) {
-                HomeScreen(products, categories, onAddToCart = { product ->
+            when (selectedTab) {
+                0 -> HomeScreen(products, categories, onAddToCart = { product ->
                     cartItems.add(product)
                     Toast.makeText(context, "${product.name} added to cart", Toast.LENGTH_SHORT).show()
                 })
-            } else if (selectedTab == 3) {
-                OrdersScreen(userOrders)
-            } else {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                3 -> OrdersScreen(userOrders)
+                else -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Coming Soon")
                 }
             }
@@ -345,13 +346,21 @@ fun ProductCard(product: ProductItem, onAddToCart: () -> Unit) {
                     .background(Color.LightGray),
                 contentAlignment = Alignment.Center
             ) {
-                // Showing a generic image icon if no real image is loaded
-                Icon(
-                    if (product.imageUrl.isNotEmpty()) Icons.Default.Image else Icons.Default.ThumbUp,
-                    contentDescription = null, 
-                    modifier = Modifier.size(40.dp),
-                    tint = Color.Gray
-                )
+                if (product.imageUrl.isNotBlank() && product.imageUrl != "null") {
+                    AsyncImage(
+                        model = product.imageUrl,
+                        contentDescription = product.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.ThumbUp,
+                        contentDescription = null,
+                        modifier = Modifier.size(40.dp),
+                        tint = Color.Gray
+                    )
+                }
             }
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(

@@ -17,6 +17,10 @@ import com.example.thredsnp.ui.theme.THREDSNPTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Initialize ProductManager to load saved products
+        ProductManager.init(this)
+
         enableEdgeToEdge()
         setContent {
             THREDSNPTheme {

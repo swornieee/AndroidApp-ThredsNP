@@ -37,15 +37,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.thredsnp.ProductManager
+import com.example.thredsnp.model.ProductItem
 import com.example.thredsnp.view.ui.theme.THREDSNPTheme
 
 data class Order(val id: String, val customer: String, val amount: String, val status: String)
-data class ProductItem(val id: String, val name: String, val price: String, val imageUrl: String)
-
 
 class SupplierDashboard : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Ensure ProductManager is initialized
+        ProductManager.init(this)
+        
         enableEdgeToEdge()
         setContent {
             THREDSNPTheme {
@@ -68,8 +71,8 @@ fun SupplierDashboardScreen() {
     if (showAddProductDialog) {
         AddProductDialog(
             onDismiss = { showAddProductDialog = false },
-            onAddProduct = { product ->
-                products.add(product)
+            onAddProduct = { product, uri ->
+                ProductManager.addProduct(context, product, uri)
                 showAddProductDialog = false
             }
         )
@@ -239,7 +242,7 @@ fun AnalyticsScreen(paddingValues: PaddingValues) {
 }
 
 @Composable
-fun AddProductDialog(onDismiss: () -> Unit, onAddProduct: (ProductItem) -> Unit) {
+fun AddProductDialog(onDismiss: () -> Unit, onAddProduct: (ProductItem, Uri?) -> Unit) {
     var productName by remember { mutableStateOf("") }
     var productPrice by remember { mutableStateOf("") }
     var productCategory by remember { mutableStateOf("") }
@@ -312,9 +315,9 @@ fun AddProductDialog(onDismiss: () -> Unit, onAddProduct: (ProductItem) -> Unit)
                     id = "P${(0..1000).random()}",
                     name = productName,
                     price = "NRP $productPrice",
-                    imageUrl = imageUri.toString()
+                    imageUrl = "" // Will be updated by ProductManager
                 )
-                onAddProduct(newProduct)
+                onAddProduct(newProduct, imageUri)
             }) {
                 Text("Add Product")
             }
