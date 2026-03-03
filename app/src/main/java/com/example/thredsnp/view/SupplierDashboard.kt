@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,7 +43,12 @@ import com.example.thredsnp.view.ui.theme.THREDSNPTheme
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Order(val id: String, val customer: String, val amount: String, val status: String)
+data class Order(
+    val id: String = "",
+    val customer: String = "",
+    val amount: String = "",
+    val status: String = ""
+)
 
 class SupplierDashboard : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -238,7 +244,7 @@ fun ProductItemCard(product: ProductItem, onDelete: () -> Unit) {
                 }
             }
             Column(modifier = Modifier.padding(8.dp)) {
-                Text(product.name, fontWeight = FontWeight.Bold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                Text(product.name, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(product.price, color = MaterialTheme.colorScheme.primary)
             }
         }

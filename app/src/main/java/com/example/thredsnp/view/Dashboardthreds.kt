@@ -45,6 +45,10 @@ data class UserOrder(val id: String, val date: String, val amount: String, val i
 class Dashboardthreds : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Initialize ProductManager to load saved products
+        ProductManager.init(this)
+        
         enableEdgeToEdge()
         setContent {
             THREDSNPTheme {
@@ -91,7 +95,7 @@ fun DashboardScreen() {
                                 val total = cartItems.sumOf { it.price.replace("NRP ", "").replace(",", "").toIntOrNull() ?: 0 }
                                 val newOrder = Order(
                                     id = "#ORD${System.currentTimeMillis().toString().takeLast(4)}",
-                                    customer = "Customer", // In a real app, this would be the logged-in user
+                                    customer = "Customer",
                                     amount = "NRP $total",
                                     status = "Pending"
                                 )

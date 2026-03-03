@@ -5,6 +5,10 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
 import com.example.thredsnp.model.ProductItem
 import com.example.thredsnp.view.Order
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -13,7 +17,7 @@ import java.io.FileOutputStream
 object ProductManager {
     private const val PREFS_NAME = "thredsnp_prefs"
     private const val KEY_PRODUCTS = "products_list"
-    private const val KEY_ORDERS = "orders_list"
+    private val database = FirebaseDatabase.getInstance().reference
 
     val products = mutableStateListOf<ProductItem>()
     val orders = mutableStateListOf<Order>()
@@ -35,20 +39,9 @@ object ProductManager {
                 loadDefaults()
             }
         }
-
-        if (orders.isEmpty()) {
-            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            val ordersJson = prefs.getString(KEY_ORDERS, null)
-            if (ordersJson != null) {
-                try {
-                    val decoded = Json.decodeFromString<List<Order>>(ordersJson)
-                    orders.clear()
-                    orders.addAll(decoded)
-                } catch (e: Exception) {
-                    // No orders yet or error
-                }
-            }
-        }
+        
+        // Setup real-time listener for orders from Firebase
+        listenForOrders()
     }
 
     private fun loadDefaults() {
@@ -91,8 +84,29 @@ object ProductManager {
     }
 
     fun placeOrder(context: Context, order: Order) {
-        orders.add(0, order) // Add latest order at the top
-        saveOrders(context)
+        // 1. Push to Firebase Realtime Database
+        val orderId = order.id.replace("#", "")
+        database.child("orders").child(orderId).setValue(order)
+    }
+
+    private fun listenForOrders() {
+        database.child("orders").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val newOrders = mutableListOf<Order>()
+                for (orderSnapshot in snapshot.children) {
+                    val order = orderSnapshot.getValue(Order::class.java)
+                    if (order != null) {
+                        newOrders.add(0, order)
+                    }
+                }
+                orders.clear()
+                orders.addAll(newOrders)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle database error
+            }
+        })
     }
 
     private fun saveImageToInternalStorage(context: Context, uri: Uri): String? {
@@ -117,11 +131,5 @@ object ProductManager {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val jsonString = Json.encodeToString(products.toList())
         prefs.edit().putString(KEY_PRODUCTS, jsonString).apply()
-    }
-
-    private fun saveOrders(context: Context) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val jsonString = Json.encodeToString(orders.toList())
-        prefs.edit().putString(KEY_ORDERS, jsonString).apply()
     }
 }
