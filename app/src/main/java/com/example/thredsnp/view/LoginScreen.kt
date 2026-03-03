@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -71,7 +72,7 @@ fun LoginContent(modifier: Modifier = Modifier) {
             onValueChange = { email = it },
             label = { Text("Email Address") },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("emailField"),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             shape = MaterialTheme.shapes.medium
         )
@@ -83,7 +84,7 @@ fun LoginContent(modifier: Modifier = Modifier) {
             onValueChange = { password = it },
             label = { Text("Password") },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("passwordField"),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             shape = MaterialTheme.shapes.medium
@@ -107,7 +108,8 @@ fun LoginContent(modifier: Modifier = Modifier) {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(50.dp)
+                .testTag("loginButton"),
             shape = MaterialTheme.shapes.medium
         ) {
             Text("Login", fontSize = 18.sp)
@@ -121,7 +123,8 @@ fun LoginContent(modifier: Modifier = Modifier) {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(50.dp)
+                .testTag("supplierLoginButton"),
             shape = MaterialTheme.shapes.medium,
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.secondary)
         ) {

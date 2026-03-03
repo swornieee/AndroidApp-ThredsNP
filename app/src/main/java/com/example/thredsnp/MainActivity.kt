@@ -13,12 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.thredsnp.ui.theme.THREDSNPTheme
 
-// Main entry point for the ThredsNP application
+/**
+ * Main entry point for the ThredsNP application.
+ * Handles the initial setup and root UI structure.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Initialize ProductManager to load saved products
+        // Initialize ProductManager to load saved products from local storage
         ProductManager.init(this)
 
         enableEdgeToEdge()
@@ -26,7 +29,7 @@ class MainActivity : ComponentActivity() {
             THREDSNPTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "User",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -38,7 +41,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name!",
+        text = "Welcome to ThredsNP, $name!",
         modifier = modifier
     )
 }
@@ -47,6 +50,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     THREDSNPTheme {
-        Greeting("Android")
+        Greeting("User")
     }
 }

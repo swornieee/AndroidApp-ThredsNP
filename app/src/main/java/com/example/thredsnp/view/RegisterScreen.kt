@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -75,7 +76,7 @@ fun RegisterContent(modifier: Modifier = Modifier) {
             onValueChange = { fullName = it },
             label = { Text("Full Name") },
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("fullNameField"),
             shape = MaterialTheme.shapes.medium
         )
 
@@ -86,7 +87,7 @@ fun RegisterContent(modifier: Modifier = Modifier) {
             onValueChange = { email = it },
             label = { Text("Email Address") },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("emailField"),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             shape = MaterialTheme.shapes.medium
         )
@@ -98,7 +99,7 @@ fun RegisterContent(modifier: Modifier = Modifier) {
             onValueChange = { phone = it },
             label = { Text("Phone Number") },
             leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("phoneField"),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             shape = MaterialTheme.shapes.medium
         )
@@ -110,7 +111,7 @@ fun RegisterContent(modifier: Modifier = Modifier) {
             onValueChange = { password = it },
             label = { Text("Password") },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("passwordField"),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             shape = MaterialTheme.shapes.medium
@@ -123,7 +124,7 @@ fun RegisterContent(modifier: Modifier = Modifier) {
             onValueChange = { confirmPassword = it },
             label = { Text("Confirm Password") },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("confirmPasswordField"),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             shape = MaterialTheme.shapes.medium
@@ -139,7 +140,8 @@ fun RegisterContent(modifier: Modifier = Modifier) {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(50.dp)
+                .testTag("registerButton"),
             shape = MaterialTheme.shapes.medium
         ) {
             Text("Register", fontSize = 18.sp)
@@ -147,10 +149,13 @@ fun RegisterContent(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = { 
-            val intent = Intent(context, LoginScreen::class.java)
-            context.startActivity(intent)
-        }) {
+        TextButton(
+            onClick = { 
+                val intent = Intent(context, LoginScreen::class.java)
+                context.startActivity(intent)
+            },
+            modifier = Modifier.testTag("loginNavigateButton")
+        ) {
             Text("Already have an account? Login")
         }
     }
