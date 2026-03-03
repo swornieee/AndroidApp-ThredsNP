@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -79,7 +81,15 @@ fun DashboardScreen() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("THREDS NP", fontWeight = FontWeight.Bold) },
+                title = { 
+                    Text(
+                        text = "THREDS NP", 
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFFFFD700), // Yellow color
+                        fontFamily = FontFamily.Serif,
+                        fontStyle = FontStyle.Italic
+                    ) 
+                },
                 actions = {
                     BadgedBox(
                         badge = {
