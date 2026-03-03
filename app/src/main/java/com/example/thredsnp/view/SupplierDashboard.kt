@@ -117,7 +117,11 @@ fun SupplierDashboardScreen() {
         },
         floatingActionButton = {
             if (selectedTab == 0) { // Show FAB only on Inventory tab
-                FloatingActionButton(onClick = { showAddProductDialog = true }) {
+                FloatingActionButton(
+                    onClick = { showAddProductDialog = true },
+                    containerColor = Color(0xFF800000), // Maroon Red
+                    contentColor = Color.White
+                ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Product")
                 }
             }
@@ -428,15 +432,18 @@ fun AddProductDialog(onDismiss: () -> Unit, onAddProduct: (ProductItem, Uri?) ->
             }
         },
         confirmButton = {
-            Button(onClick = {
-                val newProduct = ProductItem(
-                    id = "P${(0..1000).random()}",
-                    name = productName,
-                    price = "NRP $productPrice",
-                    imageUrl = "" // Will be updated by ProductManager
-                )
-                onAddProduct(newProduct, imageUri)
-            }) {
+            Button(
+                onClick = {
+                    val newProduct = ProductItem(
+                        id = "P${(0..1000).random()}",
+                        name = productName,
+                        price = "NRP $productPrice",
+                        imageUrl = "" // Will be updated by ProductManager
+                    )
+                    onAddProduct(newProduct, imageUri)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF800000)) // Maroon Red
+            ) {
                 Text("Add Product")
             }
         },
