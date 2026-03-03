@@ -39,7 +39,9 @@ import coil.compose.AsyncImage
 import com.example.thredsnp.ProductManager
 import com.example.thredsnp.model.ProductItem
 import com.example.thredsnp.view.ui.theme.THREDSNPTheme
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Order(val id: String, val customer: String, val amount: String, val status: String)
 
 class SupplierDashboard : ComponentActivity() {
@@ -67,6 +69,7 @@ fun SupplierDashboardScreen() {
     val context = LocalContext.current
 
     val products = ProductManager.products
+    val orders = ProductManager.orders
 
     if (showAddProductDialog) {
         AddProductDialog(
@@ -138,7 +141,7 @@ fun SupplierDashboardScreen() {
     ) { innerPadding ->
         when (selectedTab) {
             0 -> InventoryScreen(innerPadding, products)
-            1 -> OrdersScreen(innerPadding)
+            1 -> OrdersScreen(innerPadding, orders)
             2 -> AnalyticsScreen(innerPadding)
         }
     }
@@ -146,6 +149,33 @@ fun SupplierDashboardScreen() {
 
 @Composable
 fun InventoryScreen(paddingValues: PaddingValues, products: List<ProductItem>) {
+    val context = LocalContext.current
+    var productToDelete by remember { mutableStateOf<ProductItem?>(null) }
+
+    if (productToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { productToDelete = null },
+            title = { Text("Delete Product") },
+            text = { Text("Are you sure you want to delete ${productToDelete?.name}?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        productToDelete?.let { ProductManager.removeProduct(context, it) }
+                        productToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { productToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier
@@ -156,14 +186,21 @@ fun InventoryScreen(paddingValues: PaddingValues, products: List<ProductItem>) {
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(products) { product ->
-            ProductItemCard(product)
+            ProductItemCard(
+                product = product,
+                onDelete = { productToDelete = product }
+            )
         }
     }
 }
 
 @Composable
-fun ProductItemCard(product: ProductItem) {
-    Card(shape = RoundedCornerShape(12.dp), elevation = CardDefaults.cardElevation(4.dp)) {
+fun ProductItemCard(product: ProductItem, onDelete: () -> Unit) {
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Column {
             Box(
                 modifier = Modifier
@@ -182,9 +219,26 @@ fun ProductItemCard(product: ProductItem) {
                 } else {
                     Icon(Icons.Default.HideImage, "no product image", modifier = Modifier.size(40.dp))
                 }
+                
+                // Delete button in the top right corner of the image
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                        .size(28.dp)
+                        .background(Color.White.copy(alpha = 0.7f), RoundedCornerShape(14.dp))
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = Color.Red,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
             Column(modifier = Modifier.padding(8.dp)) {
-                Text(product.name, fontWeight = FontWeight.Bold)
+                Text(product.name, fontWeight = FontWeight.Bold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                 Text(product.price, color = MaterialTheme.colorScheme.primary)
             }
         }
@@ -192,39 +246,42 @@ fun ProductItemCard(product: ProductItem) {
 }
 
 @Composable
-fun OrdersScreen(paddingValues: PaddingValues) {
-    val orders = listOf(
-        Order("#101", "Ram Bahadur", "NRP 4,500", "Pending"),
-        Order("#102", "Sita Kumari", "NRP 12,000", "Shipped"),
-        Order("#103", "Hari Thapa", "NRP 3,200", "Delivered"),
-        Order("#104", "Gita Sharma", "NRP 8,500", "Pending")
-    )
+fun OrdersScreen(paddingValues: PaddingValues, orders: List<Order>) {
     Column(
         modifier = Modifier
             .padding(paddingValues)
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        val totalSales = orders.sumOf { it.amount.replace("NRP ", "").replace(",", "").toIntOrNull() ?: 0 }
+        
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            StatCard("Total Sales", "NRP 85K", Icons.Default.ShoppingCart, Modifier.weight(1f))
-            StatCard("Orders", "24", Icons.AutoMirrored.Filled.List, Modifier.weight(1f))
+            StatCard("Total Sales", "NRP $totalSales", Icons.Default.ShoppingCart, Modifier.weight(1f))
+            StatCard("Orders", "${orders.size}", Icons.AutoMirrored.Filled.List, Modifier.weight(1f))
         }
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Recent Orders",
+            text = "Customer Orders",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(orders) { order ->
-                OrderListItem(order)
+        
+        if (orders.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("No orders from customers yet")
+            }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(orders) { order ->
+                    OrderListItem(order)
+                }
             }
         }
     }

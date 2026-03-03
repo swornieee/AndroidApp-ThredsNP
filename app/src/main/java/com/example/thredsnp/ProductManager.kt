@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
 import com.example.thredsnp.model.ProductItem
+import com.example.thredsnp.view.Order
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -12,25 +13,41 @@ import java.io.FileOutputStream
 object ProductManager {
     private const val PREFS_NAME = "thredsnp_prefs"
     private const val KEY_PRODUCTS = "products_list"
+    private const val KEY_ORDERS = "orders_list"
 
     val products = mutableStateListOf<ProductItem>()
+    val orders = mutableStateListOf<Order>()
 
     fun init(context: Context) {
-        if (products.isNotEmpty()) return
-        
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val jsonString = prefs.getString(KEY_PRODUCTS, null)
-        
-        if (jsonString != null) {
-            try {
-                val decoded = Json.decodeFromString<List<ProductItem>>(jsonString)
-                products.clear()
-                products.addAll(decoded)
-            } catch (e: Exception) {
+        if (products.isEmpty()) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val productsJson = prefs.getString(KEY_PRODUCTS, null)
+            
+            if (productsJson != null) {
+                try {
+                    val decoded = Json.decodeFromString<List<ProductItem>>(productsJson)
+                    products.clear()
+                    products.addAll(decoded)
+                } catch (e: Exception) {
+                    loadDefaults()
+                }
+            } else {
                 loadDefaults()
             }
-        } else {
-            loadDefaults()
+        }
+
+        if (orders.isEmpty()) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val ordersJson = prefs.getString(KEY_ORDERS, null)
+            if (ordersJson != null) {
+                try {
+                    val decoded = Json.decodeFromString<List<Order>>(ordersJson)
+                    orders.clear()
+                    orders.addAll(decoded)
+                } catch (e: Exception) {
+                    // No orders yet or error
+                }
+            }
         }
     }
 
@@ -59,7 +76,6 @@ object ProductManager {
     }
 
     fun removeProduct(context: Context, product: ProductItem) {
-        // Remove image if it's stored in internal storage
         if (product.imageUrl.startsWith("file:///data/user/")) {
             try {
                 val file = File(Uri.parse(product.imageUrl).path ?: "")
@@ -72,6 +88,11 @@ object ProductManager {
         }
         products.remove(product)
         saveProducts(context)
+    }
+
+    fun placeOrder(context: Context, order: Order) {
+        orders.add(0, order) // Add latest order at the top
+        saveOrders(context)
     }
 
     private fun saveImageToInternalStorage(context: Context, uri: Uri): String? {
@@ -96,5 +117,11 @@ object ProductManager {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val jsonString = Json.encodeToString(products.toList())
         prefs.edit().putString(KEY_PRODUCTS, jsonString).apply()
+    }
+
+    private fun saveOrders(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val jsonString = Json.encodeToString(orders.toList())
+        prefs.edit().putString(KEY_ORDERS, jsonString).apply()
     }
 }

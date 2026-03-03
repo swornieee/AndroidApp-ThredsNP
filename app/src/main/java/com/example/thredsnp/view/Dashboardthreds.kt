@@ -89,13 +89,21 @@ fun DashboardScreen() {
                             if (cartItems.isNotEmpty()) {
                                 // Simple calculation for total
                                 val total = cartItems.sumOf { it.price.replace("NRP ", "").replace(",", "").toIntOrNull() ?: 0 }
-                                val newOrder = UserOrder(
+                                val newOrder = Order(
                                     id = "#ORD${System.currentTimeMillis().toString().takeLast(4)}",
-                                    date = "Today",
+                                    customer = "Customer", // In a real app, this would be the logged-in user
                                     amount = "NRP $total",
+                                    status = "Pending"
+                                )
+                                ProductManager.placeOrder(context, newOrder)
+                                
+                                val uiOrder = UserOrder(
+                                    id = newOrder.id,
+                                    date = "Today",
+                                    amount = newOrder.amount,
                                     items = cartItems.toList()
                                 )
-                                userOrders.add(newOrder)
+                                userOrders.add(0, uiOrder)
                                 cartItems.clear()
                                 Toast.makeText(context, "Order Placed Successfully!", Toast.LENGTH_SHORT).show()
                                 selectedTab = 3 
