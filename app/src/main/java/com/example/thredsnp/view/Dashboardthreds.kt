@@ -68,8 +68,8 @@ fun DashboardScreen() {
     val context = LocalContext.current
 
     val categories = listOf(
-        Category("Fashion", Icons.Default.Face),
-        Category("Sports", Icons.Default.Star),
+        Category("Fashion", Icons.Default.Checkroom),
+        Category("Sports", Icons.Default.SportsBasketball),
         Category("Shoes", Icons.Default.IceSkating)
     )
 
