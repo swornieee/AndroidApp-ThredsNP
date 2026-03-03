@@ -186,6 +186,8 @@ fun DashboardScreen() {
 @Composable
 fun HomeScreen(products: List<ProductItem>, categories: List<Category>, wishlist: List<ProductItem>, onAddToCart: (ProductItem) -> Unit, onToggleWishlist: (ProductItem) -> Unit) {
     var searchQuery by remember { mutableStateOf("") }
+    val filteredProducts = products.filter { it.name.contains(searchQuery, ignoreCase = true) }
+
     Column {
         OutlinedTextField(
             value = searchQuery,
@@ -217,7 +219,7 @@ fun HomeScreen(products: List<ProductItem>, categories: List<Category>, wishlist
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(products) { product ->
+            items(filteredProducts) { product ->
                 ProductCard(product, isWishlisted = wishlist.contains(product), onAddToCart = { onAddToCart(product) }, onToggleWishlist = { onToggleWishlist(product) })
             }
         }
